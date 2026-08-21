@@ -1,9 +1,34 @@
-#include<tensor/tensor.h>
-struct TokenEmbeddingImpl : torch::nn::Module {
-    torch::nn::Embedding table{nullptr};
+#include "model.hpp"
 
-    TokenEmbeddingImpl(int64_t vocab_size, int64_t n_embd);
-    torch::Tensor forward(torch::Tensor token_ids);
-};
+TokenEmbeddingImpl::TokenEmbeddingImpl(int64_t num_embeddings, int64_t n_emb){
+    table = register_module(
+        "table",
+        torch::nn::Embedding(num_embeddings, n_emb)
+    );
+}
 
-TORCH_MODULE(TokenEmbedding);
+torch::Tensor TokenEmbeddingImpl::forward(torch::Tensor token_ids){
+    return table(token_ids);
+}
+
+HeadImpl::HeadImpl(int64_t n_emb, int64_t head_size){
+    key = register_module(
+        "key",
+        torch::nn::Linear(
+            torch::nn::LinearOptions(n_emb, head_size).bias(false)
+        )
+    );
+
+    query = register_module(
+    "query",
+    torch::nn::Linear(
+        torch::nn::LinearOptions(n_emb, head_size).bias(false)
+    )
+);
+    value = register_module(
+    "value",
+    torch::nn::Linear(
+        torch::nn::LinearOptions(n_emb, head_size).bias(false)
+    )
+);
+}

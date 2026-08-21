@@ -1,2 +1,6 @@
 /build
-input.txtthird_party/
+input.txt
+third_party/
+*.zip
+*.dylib
+*.so
